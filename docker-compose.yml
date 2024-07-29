@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGODB_URI=mongodb+srv://sorihuen:Gzqxy2L5LCIzohUf@apiuser.dwxhvgc.mongodb.net/?retryWrites=true&w=majority&appName=apiuser
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules

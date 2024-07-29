@@ -1,0 +1,58 @@
+# Node modules directory
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+
+# IDE and editor directories
+.vscode/
+.idea/
+
+# npm cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+jspm_packages/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage
+coverage/
+*.lcov
+
+# Production files
+*.prod.js
+*.prod.ts
+
+# Miscellaneous
+*.swp
+*.swo
+
+# Docker related files
+docker-compose.override.yml
+.docker/
+*.dockerfile
+*.docker-compose.yml
+
+# Docker build output
+docker-image/
+docker-container/
+
+# Docker runtime
+docker/
