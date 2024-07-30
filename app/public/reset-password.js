@@ -3,11 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const token = new URLSearchParams(window.location.search).get("token");
   form.querySelector("#token").value = token;
 
+  console.log("Frontend - Token extraído de la URL:", token);
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault(); // Evita el envío del formulario por defecto
 
     const newPassword = form.querySelector("#new-password").value;
     const token = form.querySelector("#token").value;
+
+    console.log("Frontend - Nueva contraseña:", newPassword);
+    console.log("Frontend - Token:", token);
 
     try {
       const response = await fetch(
@@ -23,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await response.json();
 
+      console.log("Frontend - Respuesta del servidor:", data);
+
       if (response.ok) {
         alert("Contraseña actualizada correctamente.");
         form.reset();
@@ -33,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
         errorElement.classList.remove("escondido");
       }
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      console.error("Frontend - Error en la solicitud:", error);
       const errorElement = form.querySelector(".error");
       errorElement.textContent =
         "Error del servidor. Intenta de nuevo más tarde.";

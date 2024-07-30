@@ -78,7 +78,7 @@ async function login(req, res) {
   }
 }
 
-// Lógica Register
+//***** * Lógica Register ********
 
 async function register(req, res) {
   const { user, email, password } = req.body;
@@ -134,20 +134,38 @@ async function forgotPassword(req, res) {
 
   try {
     const user = await User.findOne({ email });
+
     if (!user) {
       return res
         .status(404)
         .json({ status: "Error", message: "Usuario no encontrado" });
     }
 
+    const now = Date.now();
+    const tenMinutes = 10 * 60 * 1000; // 10 minutos
+
+    // Verifica si ha pasado más de 10 minutos desde la última solicitud
+    if (
+      user.lastPasswordResetRequest &&
+      now - user.lastPasswordResetRequest < tenMinutes
+    ) {
+      return res
+        .status(429)
+        .json({
+          status: "Error",
+          message:
+            "Ya has solicitado un restablecimiento de contraseña recientemente. Intenta de nuevo más tarde.",
+        });
+    }
+
     const token = crypto.randomBytes(20).toString("hex");
 
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    user.resetPasswordExpires = now + 3600000; // 1 hora
+    user.lastPasswordResetRequest = now; // Actualiza la fecha de la última solicitud
 
     await user.save();
 
-    // Enviar el correo de recuperación
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -171,6 +189,9 @@ async function resetPassword(req, res) {
   const { token } = req.params;
   const { newPassword } = req.body;
 
+  console.log("resetPassword - Token recibido:", token);
+  console.log("resetPassword - Nueva contraseña recibida:", newPassword);
+
   if (!token || !newPassword) {
     return res.status(400).json({
       status: "Error",
@@ -183,6 +204,7 @@ async function resetPassword(req, res) {
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }, // Verifica si el token no ha expirado
     });
+    console.log("resetPassword - Usuario encontrado:", user);
 
     if (!user) {
       return res
@@ -196,13 +218,14 @@ async function resetPassword(req, res) {
     user.resetPasswordExpires = undefined; // Elimina la expiración
 
     await user.save();
+    console.log("resetPassword - Contraseña actualizada correctamente");
 
     res.status(200).json({
       status: "Success",
       message: "Contraseña actualizada correctamente",
     });
   } catch (error) {
-    console.error("Error al actualizar la contraseña:", error);
+    console.error("resetPassword - Error al actualizar la contraseña:", error);
     res.status(500).json({ status: "Error", message: "Error del servidor" });
   }
 }
